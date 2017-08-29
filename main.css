@@ -1,9 +1,17 @@
 body {
 	background: black;
+	font-family: sans-serif;
 }
 
 canvas {
 	position: fixed;
 	top: 0px;
 	left: 0px;
+}
+
+header {
+	color: #fff;
+	text-align: center;
+	font-size: 3em;
+	font-family: Futura, sans-serif;
 }
