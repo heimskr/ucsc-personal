@@ -1,13 +1,27 @@
 let unspeed = -5;
-let delay = 1000 / 30;
-let size = 10;
-let spacing = 0;
-let breadth = 20;
-let width = 200;
-let colorUnspeed = 20;
-let colorHeight = 6;
+let size = 16;
+let spacing = 5;
+let ratio = 16;
+
+let colorUnspeed = -20;
+let colorStretch = 20;
+let colorRange = [0.05, 1];
+let colorMode = "opaque";
+let direction = "h";
+
+let breadth, stretch;
 
 const {floor, ceil, round, abs, sin, cos, PI: pi} = Math;
+
+let getColor;
+if (colorMode == "transparent") {
+	getColor = (shift) => `rgba(255, 255, 255, ${shift})`;
+} else {
+	getColor = (shift) => {
+		const floored = floor(shift * 255);
+		return `rgb(${floored}, ${floored}, ${floored})`;
+	}
+}
 
 function remap(value, oldMin, oldMax, newMin, newMax) {
 	return (value - oldMin) / (oldMax - oldMin) * (newMax - newMin) + newMin;
@@ -15,16 +29,17 @@ function remap(value, oldMin, oldMax, newMin, newMax) {
 
 class Main {
 	static init(selector) {
-		this.offset = 0;
-
 		this.canvas = $(selector)[0];
 		this.ctx = this.canvas.getContext("2d");
 		this.adjust();
 	}
 
 	static resize(factor = 1) {
-		const newWidth = window.innerWidth * factor
-		const newHeight = window.innerHeight * factor
+		const newWidth = window.innerWidth * factor;
+		const newHeight = window.innerHeight * factor;
+
+		stretch = window.innerHeight / 3;
+		breadth = stretch / ratio;
 		
 		if (this.width == newWidth && this.height == newHeight) {
 			return;
@@ -78,13 +93,17 @@ class Main {
 
 	static circle(xOffset = 0, y = 0, radius = size, color = "#fff") {
 		this.ctx.beginPath();
-		this.ctx.arc(floor(this.midX + xOffset), floor(y), radius, 0, 2 * pi);
+		if (direction == "h") {
+			this.ctx.arc(floor(y), floor(this.midY + xOffset), radius, 0, 2 * pi);
+		} else {
+			this.ctx.arc(floor(this.midX + xOffset), floor(y), radius, 0, 2 * pi);
+		}
+
 		this.ctx.closePath();
 		this.fill(color);
 	}
 
 	static render() {
-		this.offset++;
 		const {ctx} = this;
 		
 		this.clear();
@@ -93,22 +112,21 @@ class Main {
 		const gap = size + spacing;
 
 		for (let i = 0; i < n; i++) {
-			const shift = remap(sin((i + (new Date().getTime() / colorUnspeed)) / colorHeight), -1, 1, 0.2, 1);
-			const color = `rgba(255, ${floor(1 * 255)}, 255, ${shift})`;
-			console.log(color);
-			const y = i * gap// - (new Date().getTime() / 2 % (this.height + 10));
+			const shift = remap(sin((i + (new Date().getTime() / colorUnspeed)) / colorStretch), -1, 1, ...colorRange);
+			const color = getColor(shift);
+			const y = i * gap;
 
 			const time = new Date().getTime() / unspeed;
 			const range = 500;
 
 
-			this.circle(remap(sin(i / breadth + 2*pi*(time % range)/range), -1, 1, -width, width), y, size, color);
-			this.circle(remap(cos(i / breadth + 2*pi*(time % range)/range), -1, 1, -width, width), y, size, color);
+			this.circle(remap(sin(i / breadth + 2*pi*(time % range)/range), -1, 1, -stretch, stretch), y, size, color);
+			this.circle(remap(cos(i / breadth + 2*pi*(time % range)/range), -1, 1, -stretch, stretch), y, size, color);
 		}
 	}
 
 	static get visiblePairs() {
-		return ceil(this.height / (size + spacing));
+		return ceil((direction == "h"? this.width : this.height) / (size + spacing));
 	}
 }
 
@@ -125,10 +143,13 @@ class BasePair {
 
 $(() => {
 	Main.init("canvas");
-	this.offset = 0;
 
-	Main.render();
-	setInterval(() => Main.render(), delay);
+	const renderLoop = () => {
+		Main.render();
+		window.requestAnimationFrame(renderLoop);
+	}
+
+	renderLoop();
 });
 
 $(window).on("resize", () => Main.adjust());
