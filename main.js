@@ -1,11 +1,13 @@
-let unspeed = -5;
-let size = 16;
-let spacing = 5;
-let ratio = 16;
+// I really ought to document this, but it's like 3:11 AM and I'm tired
 
-let colorUnspeed = -20;
-let colorStretch = 20;
-let colorRange = [0.05, 1];
+let unspeed = -5;
+let size = 10;
+let spacing = 5;
+let ratio = 10;
+
+let colorUnspeed = -7;
+let colorStretch = 30;
+let colorRange = [0.05, 0.8];
 let colorMode = "opaque";
 let direction = "h";
 
@@ -38,7 +40,7 @@ class Main {
 		const newWidth = window.innerWidth * factor;
 		const newHeight = window.innerHeight * factor;
 
-		stretch = window.innerHeight / 3;
+		stretch = window.innerHeight / 6 * window.devicePixelRatio;
 		breadth = stretch / ratio;
 		
 		if (this.width == newWidth && this.height == newHeight) {
@@ -52,12 +54,13 @@ class Main {
 	}
 
 	static adjust() {
-		const ratio = window.devicePixelRatio;
+		const pixelRatio = window.devicePixelRatio;
 
-		if (1 < ratio) {
-			this.resize(ratio);
+		if (1 < pixelRatio) {
+			this.resize(pixelRatio);
 			return true;
 		}
+
 
 		this.resize(1);
 		return false;
