@@ -10,9 +10,9 @@ let range = 500;
 let stretchRatio = 1;
 
 // -7 30 [0.05, 0.8] "opaque" "h"
-let colorUnspeed = 15;
+let colorUnspeed = 20;
 let colorStretch = 30;
-let colorRange = [0.05, 0.8];
+let colorRange = [0.03, 0.5];
 let colorMode = "transparent";
 let direction = "v";
 let align = "r";
