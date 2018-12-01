@@ -1,15 +1,22 @@
 // I really ought to document this, but it's like 3:11 AM and I'm tired
 
-let unspeed = -5;
-let size = 10;
-let spacing = 5;
-let ratio = 10;
+// -5 10 5 10 500
 
-let colorUnspeed = -7;
+let unspeed = -5;
+let size = 15;
+let spacing = -5;
+let ratio = 10;
+let range = 500;
+let stretchRatio = 1;
+
+// -7 30 [0.05, 0.8] "opaque" "h"
+let colorUnspeed = 15;
 let colorStretch = 30;
 let colorRange = [0.05, 0.8];
-let colorMode = "opaque";
-let direction = "h";
+let colorMode = "transparent";
+let direction = "v";
+let align = "r";
+let margin = 100;
 
 let breadth, stretch;
 
@@ -40,7 +47,7 @@ class Main {
 		const newWidth = window.innerWidth * factor;
 		const newHeight = window.innerHeight * factor;
 
-		stretch = window.innerHeight / 6 * window.devicePixelRatio;
+		stretch = window.innerHeight / 6 * window.devicePixelRatio * stretchRatio;
 		breadth = stretch / ratio;
 		
 		if (this.width == newWidth && this.height == newHeight) {
@@ -71,8 +78,15 @@ class Main {
 	static set width(to) { this.canvas.width = to; }
 	static set height(to) { this.canvas.height = to; }
 
-	static get midX() {return floor(this.width / 2); }
-	static get midY() {return floor(this.height / 2); }
+	static get midX() {
+		if (align == "r") {
+			return this.width - floor(stretch) - margin;
+		}
+		
+		return floor(this.width / 2);
+	}
+
+	static get midY() { return floor(this.height / 2); }
 
 	static clear() {
 		this.ctx.clearRect(0, 0, this.width, this.height);
@@ -115,16 +129,14 @@ class Main {
 		const gap = size + spacing;
 
 		for (let i = 0; i < n; i++) {
-			const shift = remap(sin((i + (new Date().getTime() / colorUnspeed)) / colorStretch), -1, 1, ...colorRange);
-			const color = getColor(shift);
+			const shiftS = remap(cos((i + (new Date().getTime() / colorUnspeed)) / colorStretch), -1, 1, ...colorRange);
+			const shiftC = remap(sin((i + (new Date().getTime() / colorUnspeed)) / colorStretch), -1, 1, ...colorRange);
 			const y = i * gap;
 
 			const time = new Date().getTime() / unspeed;
-			const range = 500;
 
-
-			this.circle(remap(sin(i / breadth + 2*pi*(time % range)/range), -1, 1, -stretch, stretch), y, size, color);
-			this.circle(remap(cos(i / breadth + 2*pi*(time % range)/range), -1, 1, -stretch, stretch), y, size, color);
+			this.circle(remap(sin(i / breadth + 2*pi*(time % range)/range), -1, 1, -stretch, stretch), y, size, getColor(shiftS));
+			this.circle(remap(cos(i / breadth + 2*pi*(time % range)/range), -1, 1, -stretch, stretch), y, size, getColor(shiftC));
 		}
 	}
 

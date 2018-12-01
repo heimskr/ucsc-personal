@@ -1,17 +1,33 @@
 body {
 	background: black;
 	font-family: sans-serif;
+	color: #fff;
+}
+
+a:link {
+	color: #fff;
+}
+
+a:visited {
+	color: #bbb;
 }
 
 canvas {
 	position: fixed;
 	top: 0px;
 	left: 0px;
+	pointer-events: none;
+	z-index: -1;
 }
 
 header {
-	color: #fff;
 	text-align: center;
 	font-size: 3em;
 	font-family: Futura, sans-serif;
+}
+
+main {
+	/* border: 1px solid red; */
+	width: 100%;
+	padding: 5px;
 }
