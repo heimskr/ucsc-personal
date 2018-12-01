@@ -1,5 +1,4 @@
 #!/bin/bash
-
-cp -i main.css ~/public_html/
-cp -i main.js ~/public_html/
-cp -i index.html ~/public_html/
+cp ~/public_html/main.css   .
+cp ~/public_html/main.js    .
+cp ~/public_html/index.html .
