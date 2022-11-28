@@ -49,7 +49,7 @@ class Main {
 
 		stretch = window.innerHeight / 6 * window.devicePixelRatio * stretchRatio;
 		breadth = stretch / ratio;
-		
+
 		if (this.width == newWidth && this.height == newHeight) {
 			return;
 		}
@@ -120,23 +120,53 @@ class Main {
 		this.fill(color);
 	}
 
+	static line(x1, y1, x2, y2, color = "#fff", width = 1.5 * size) {
+		this.ctx.beginPath();
+		if (direction == "h") {
+			this.ctx.moveTo(floor(y1), floor(this.midY + x1));
+			this.ctx.lineTo(floor(y2), floor(this.midY + x2));
+		} else {
+			this.ctx.moveTo(floor(this.midX + x1), floor(y1));
+			this.ctx.lineTo(floor(this.midX + x2), floor(y2));
+		}
+		this.ctx.closePath();
+		this.stroke(color, width);
+	}
+
 	static render() {
 		const {ctx} = this;
-		
+
 		this.clear();
 
 		const n = this.visiblePairs * 2;
 		const gap = size + spacing;
 
+		const shiftS = [];
+		const shiftC = [];
+		const time = [];
+
 		for (let i = 0; i < n; i++) {
-			const shiftS = remap(cos((i + (new Date().getTime() / colorUnspeed)) / colorStretch), -1, 1, ...colorRange);
-			const shiftC = remap(sin((i + (new Date().getTime() / colorUnspeed)) / colorStretch), -1, 1, ...colorRange);
+			shiftS.push(remap(cos((i + (new Date().getTime() / colorUnspeed)) / colorStretch), -1, 1, ...colorRange));
+			shiftC.push(remap(sin((i + (new Date().getTime() / colorUnspeed)) / colorStretch), -1, 1, ...colorRange));
+			time.push(new Date().getTime() / unspeed);
+		}
+
+		let prev = [remap(sin(2 * pi * (time[0] % range) / range), -1, 1, -stretch, stretch), 0];
+
+		for (let i = 0; i < n; i++) {
+			const x = remap(sin(i / breadth + 2 * pi * (time[i] % range) / range), -1, 1, -stretch, stretch);
 			const y = i * gap;
+			this.line(...prev, x, y, getColor(shiftS[i]));
+			prev = [x, y];
+		}
 
-			const time = new Date().getTime() / unspeed;
+		prev = [remap(cos(2 * pi * (time[0] % range) / range), -1, 1, -stretch, stretch), 0];
 
-			this.circle(remap(sin(i / breadth + 2*pi*(time % range)/range), -1, 1, -stretch, stretch), y, size, getColor(shiftS));
-			this.circle(remap(cos(i / breadth + 2*pi*(time % range)/range), -1, 1, -stretch, stretch), y, size, getColor(shiftC));
+		for (let i = 0; i < n; i++) {
+			const x = remap(cos(i / breadth + 2 * pi * (time[i] % range) / range), -1, 1, -stretch, stretch);
+			const y = i * gap;
+			this.line(...prev, x, y, getColor(shiftC[i]));
+			prev = [x, y];
 		}
 	}
 
